@@ -5,6 +5,7 @@ import { winstonLogger } from '@greatdaveo/jobint-shared'; // The jobint-shared 
 import { Logger } from 'winston';
 import { config } from '@notifications/config';
 import { Application } from 'express';
+import { healthRoutes } from '@notifications/routes';
 
 const SERVER_PORT = 4001;
 
@@ -13,6 +14,9 @@ const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'notificationS
 // This function will be called inside app.ts file
 export function start(app: Application): void {
   startServer(app);
+  //   To use the router 
+  app.use('', healthRoutes);
+
   startQueues();
   startElasticSearch();
 }
