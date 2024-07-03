@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { config } from '@notifications/config';
 import { Application } from 'express';
 import { healthRoutes } from '@notifications/routes';
+import { checkConnection } from '@notifications/elasticsearch';
 
 const SERVER_PORT = 4001;
 
@@ -14,7 +15,7 @@ const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'notificationS
 // This function will be called inside app.ts file
 export function start(app: Application): void {
   startServer(app);
-  //   To use the router 
+  //   To use the router
   app.use('', healthRoutes);
 
   startQueues();
@@ -23,8 +24,10 @@ export function start(app: Application): void {
 
 // The function to add the queues to
 async function startQueues(): Promise<void> {}
-
-function startElasticSearch(): void {}
+// This function will start the elastic search
+function startElasticSearch(): void {
+  checkConnection();
+}
 
 function startServer(app: Application): void {
   try {
