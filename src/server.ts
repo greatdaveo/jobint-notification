@@ -7,6 +7,7 @@ import { config } from '@notifications/config';
 import { Application } from 'express';
 import { healthRoutes } from '@notifications/routes';
 import { checkConnection } from '@notifications/elasticsearch';
+import { createConnection } from 'queues/connection';
 
 const SERVER_PORT = 4001;
 
@@ -23,7 +24,10 @@ export function start(app: Application): void {
 }
 
 // The function to add the queues to
-async function startQueues(): Promise<void> {}
+async function startQueues(): Promise<void> {
+  await createConnection();
+}
+
 // This function will start the elastic search
 function startElasticSearch(): void {
   checkConnection();
