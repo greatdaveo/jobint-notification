@@ -34,4 +34,31 @@ async function consumeAuthEmailMessages(channel: Channel): Promise<void> {
   }
 }
 
-export { consumeAuthEmailMessages };
+async function consumeOrderEmailMessages(channel: Channel): Promise<void> {
+  // To define an async function to consume authentication email messages
+  try {
+    if (!channel) {
+      // To check if the channel is not provided
+      channel = (await createConnection()) as Channel; // To create a new channel if not provided
+    }
+
+    const exchangeName = 'jobint-order-notification'; // To define the name of the exchange
+    const routingKey = 'order-email'; // To define the routing key for the messages
+    const queueName = 'order-email-queue'; // To define the name of the queue
+
+    await channel.assertExchange(exchangeName, 'direct'); // To assert (declare) the exchange with type 'direct'
+    const jobintQueue = await channel.assertQueue(queueName, { durable: true, autoDelete: false }); // To assert (declare) the queue with durability and no auto-deletion
+    await channel.bindQueue(jobintQueue.queue, exchangeName, routingKey); // To bind the queue to the exchange with the routing key
+    channel.consume(jobintQueue.queue, async (msg: ConsumeMessage | null) => {
+      // To consume messages from the queue
+      console.log(JSON.parse(msg!.content.toString())); // To log the message content after parsing it as JSON
+      // To send emails (placeholder for email sending logic)
+      // To acknowledge (placeholder for message acknowledgment logic)
+      channel.ack(msg!);
+    });
+  } catch (error) {
+    log.log('error', 'NotificationService EmailConsumer consumeOrderEmailMessages() method error: ', error);
+  }
+}
+
+export { consumeAuthEmailMessages, consumeOrderEmailMessages };
