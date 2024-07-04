@@ -8,6 +8,8 @@ import { Application } from 'express';
 import { healthRoutes } from '@notifications/routes';
 import { checkConnection } from '@notifications/elasticsearch';
 import { createConnection } from '@notifications/queues/connection';
+import { consumeAuthEmailMessages } from '@notifications/queues/email.consumer';
+import { Channel } from 'amqplib';
 
 const SERVER_PORT = 4001;
 
@@ -25,7 +27,13 @@ export function start(app: Application): void {
 
 // The function to add the queues to
 async function startQueues(): Promise<void> {
-  await createConnection();
+  const emailChannel: Channel = (await createConnection()) as Channel;
+  // To consume the messages
+  await consumeAuthEmailMessages(emailChannel);
+
+  await emailChannel.assertExchange('jobint-email-notification', 'direct');
+  const message = JSON.stringify({ name: 'jobint', service: 'notification service' });
+  emailChannel.publish('jobint-email-notification', 'auth-email', Buffer.from(message));
 }
 
 // This function will start the elastic search

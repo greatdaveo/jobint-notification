@@ -1,8 +1,8 @@
-import { config } from '@notifications/config'; 
-import { winstonLogger } from '@greatdaveo/jobint-shared'; 
-import { Channel, ConsumeMessage } from 'amqplib'; 
-import { Logger } from 'winston'; 
-import { createConnection } from '@notifications/queues/connection'; 
+import { config } from '@notifications/config';
+import { winstonLogger } from '@greatdaveo/jobint-shared';
+import { Channel, ConsumeMessage } from 'amqplib';
+import { Logger } from 'winston';
+import { createConnection } from '@notifications/queues/connection';
 
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'emailConsumer', 'debug'); // To create a logger instance with specific configuration
 
@@ -27,9 +27,10 @@ async function consumeAuthEmailMessages(channel: Channel): Promise<void> {
       // To send emails (placeholder for email sending logic)
 
       // To acknowledge (placeholder for message acknowledgment logic)
+      channel.ack(msg!);
     });
   } catch (error) {
-    log.log('error', 'NotificationService EmailConsumer consumeAuthEmailMessages() method error: ', error); 
+    log.log('error', 'NotificationService EmailConsumer consumeAuthEmailMessages() method error: ', error);
   }
 }
 
