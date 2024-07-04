@@ -7,7 +7,7 @@ import { config } from '@notifications/config';
 import { Application } from 'express';
 import { healthRoutes } from '@notifications/routes';
 import { checkConnection } from '@notifications/elasticsearch';
-import { createConnection } from 'queues/connection';
+import { createConnection } from '@notifications/queues/connection';
 
 const SERVER_PORT = 4001;
 
