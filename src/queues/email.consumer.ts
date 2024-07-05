@@ -63,8 +63,74 @@ async function consumeOrderEmailMessages(channel: Channel): Promise<void> {
     await channel.bindQueue(jobintQueue.queue, exchangeName, routingKey); // To bind the queue to the exchange with the routing key
     channel.consume(jobintQueue.queue, async (msg: ConsumeMessage | null) => {
       // To consume messages from the queue
-      console.log(JSON.parse(msg!.content.toString())); // To log the message content after parsing it as JSON
-      // To send emails (placeholder for email sending logic)
+      // console.log(JSON.parse(msg!.content.toString())); // To log the message content after parsing it as JSON
+      const {
+        receiverEmail,
+        template,
+        sender,
+        offerLink,
+        amount,
+        buyerUsername,
+        sellerUsername,
+        title,
+        description,
+        deliveryDays,
+        orderId,
+        orderDue,
+        requirements,
+        orderUrl,
+        originalDate,
+        newDate,
+        reason,
+        subject,
+        header,
+        type,
+        message,
+        serviceFee,
+        total,
+        username,
+        verifyLink,
+        resetLink
+      } = JSON.parse(msg!.content.toString());
+
+      // To set up the locals to be displayed on the email template
+      const locals: IEmailLocals = {
+        appLink: `${config.CLIENT_URL}`,
+        appIcon: 'https://i.ibb.co/vZsVqYS/Job-Int-App-Logo.png',
+        sender,
+        offerLink,
+        amount,
+        buyerUsername,
+        sellerUsername,
+        title,
+        description,
+        deliveryDays,
+        orderId,
+        orderDue,
+        requirements,
+        orderUrl,
+        originalDate,
+        newDate,
+        reason,
+        subject,
+        header,
+        type,
+        message,
+        serviceFee,
+        total,
+        username,
+        verifyLink,
+        resetLink
+      };
+
+      // To send emails
+      if (template === 'orderPlaced') {
+        await sendEmail('orderPlaced', receiverEmail, locals);
+        await sendEmail('orderReceipt', receiverEmail, locals);
+      } else {
+        await sendEmail(template, receiverEmail, locals);
+      }
+
       // To acknowledge (placeholder for message acknowledgment logic)
       channel.ack(msg!);
     });
