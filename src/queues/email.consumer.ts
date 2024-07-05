@@ -1,8 +1,9 @@
 import { config } from '@notifications/config';
-import { winstonLogger } from '@greatdaveo/jobint-shared';
+import { IEmailLocals, winstonLogger } from '@greatdaveo/jobint-shared';
 import { Channel, ConsumeMessage } from 'amqplib';
 import { Logger } from 'winston';
 import { createConnection } from '@notifications/queues/connection';
+import { sendEmail } from '@notifications/queues/mail.transport';
 
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'emailConsumer', 'debug'); // To create a logger instance with specific configuration
 
@@ -23,8 +24,19 @@ async function consumeAuthEmailMessages(channel: Channel): Promise<void> {
     await channel.bindQueue(jobintQueue.queue, exchangeName, routingKey); // To bind the queue to the exchange with the routing key
     channel.consume(jobintQueue.queue, async (msg: ConsumeMessage | null) => {
       // To consume messages from the queue
-      console.log(JSON.parse(msg!.content.toString())); // To log the message content after parsing it as JSON
+      // console.log(JSON.parse(msg!.content.toString())); // To log the message content after parsing it as JSON
+      const { receiverEmail, username, verifyLink, resetLink, template } = JSON.parse(msg!.content.toString());
+      // These are properties that will be displayed in the email
+      const locals: IEmailLocals = {
+        appLink: `${config.CLIENT_URL}`,
+        appIcon: 'https://i.ibb.co/vZsVqYS/Job-Int-App-Logo.png',
+        username,
+        verifyLink,
+        resetLink
+      };
+
       // To send emails (placeholder for email sending logic)
+      await sendEmail(template, receiverEmail, locals);
 
       // To acknowledge (placeholder for message acknowledgment logic)
       channel.ack(msg!);

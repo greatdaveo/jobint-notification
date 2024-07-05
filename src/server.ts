@@ -1,7 +1,7 @@
 import 'express-async-errors';
 import http from 'http';
 
-import { winstonLogger } from '@greatdaveo/jobint-shared'; // The jobint-shared library
+import { IEmailMessageDetails, winstonLogger } from '@greatdaveo/jobint-shared'; // The jobint-shared library
 import { Logger } from 'winston';
 import { config } from '@notifications/config';
 import { Application } from 'express';
@@ -31,10 +31,20 @@ async function startQueues(): Promise<void> {
   // To consume the messages
   await consumeAuthEmailMessages(emailChannel);
   await consumeOrderEmailMessages(emailChannel);
+
+  // To use the sendEmail method
+  const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=12345fruidhfcvjd`;
+  const messageDetails: IEmailMessageDetails = {
+    receiverEmail: `${config.SENDER_EMAIL}`,
+    verifyLink: verificationLink,
+    template: 'verifyEmail'
+  };
+
   // For Jobint email exchange
   await emailChannel.assertExchange('jobint-email-notification', 'direct');
-  const message = JSON.stringify({ name: 'jobint', service: 'auth notification service' });
+  const message = JSON.stringify(messageDetails);
   emailChannel.publish('jobint-email-notification', 'auth-email', Buffer.from(message));
+
   // For Jobint order exchange
   await emailChannel.assertExchange('jobint-order-notification', 'direct');
   const message1 = JSON.stringify({ name: 'jobint', service: 'order notification service' });
