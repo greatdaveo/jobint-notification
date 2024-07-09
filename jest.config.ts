@@ -1,7 +1,7 @@
 import type { Config } from '@jest/types';
 
 const jestConfig: Config.InitialOptions = {
-  preset: 'tes-jest',
+  preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
   coverageDirectory: 'coverage',
